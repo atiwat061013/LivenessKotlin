@@ -1,16 +1,17 @@
 package com.seen.livenesskotlin
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import com.huawei.hms.mlsdk.livenessdetection.MLLivenessCaptureResult
 import com.huawei.hms.mlsdk.livenessdetection.MLLivenessDetectView
 import com.huawei.hms.mlsdk.livenessdetection.OnMLLivenessDetectCallback
-import com.seen.livenesskotlin.MainActivity.Companion.customCallback
 
 import com.seen.livenesskotlin.databinding.ActivityLivenessCustomBinding
 
@@ -35,7 +36,13 @@ class LivenessCustomActivity : AppCompatActivity() {
             .setFaceFrameRect(Rect(0, 0, widthPixels, dip2px(this, 480f)))
             .setDetectCallback(object : OnMLLivenessDetectCallback {
                 override fun onCompleted(result: MLLivenessCaptureResult) {
-                    customCallback.onSuccess(result)
+                    val resultIntent = Intent().apply {
+                        bundleOf(
+                            "isLive" to result.isLive,
+                            "score" to result.score
+                        )
+                    }
+                    setResult(RESULT_OK, resultIntent)
 
                     Log.d("LivenessCustom", "result: $result")
                     finish()
@@ -43,7 +50,7 @@ class LivenessCustomActivity : AppCompatActivity() {
 
                 override fun onError(i: Int) {
 //                        MainActivity.callback.onFailure(i)
-                    finish()
+//                    finish()
                 }
 
                 override fun onStateChange(i: Int, bundle: Bundle) {}
